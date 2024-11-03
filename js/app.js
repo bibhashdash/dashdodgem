@@ -119,19 +119,34 @@ const drawRandomTreesRight = () => {
   }
 };
 
-let presentInitialX = Math.floor(Math.random() * (280 - 190) + 190);
-let presentY = 0;
-const drawPresent = () => {
-  const presentImage = new Image();
-  presentImage.src = "coin.png";
-  presentImage.addEventListener("load", (e) => {
-    ctx.drawImage(presentImage, 0, 0, 512, 512, presentInitialX, presentY, 30, 30)
+let coinInitialX = Math.floor(Math.random() * (280 - 190) + 190);
+let coinY = 0;
+
+let moneyBagInitialX = Math.floor(Math.random() * (280 - 190) + 190);
+let moneyBagY = 0;
+const drawRewards = () => {
+  const coinImage = new Image();
+  coinImage.src = "coin.png";
+  coinImage.addEventListener("load", (e) => {
+    ctx.drawImage(coinImage, 0, 0, 512, 512, coinInitialX, coinY, 30, 30)
   })
 
-  presentY += 5
-  if (presentY > canvas.height) {
-    presentInitialX = Math.floor(Math.random() * (280 - 190) + 190);
-    presentY = 0;
+  coinY += 5
+  if (coinY > canvas.height) {
+    coinInitialX = Math.floor(Math.random() * (280 - 190) + 190);
+    coinY = 0;
+  }
+
+  const moneyBagImage = new Image();
+  moneyBagImage.src = "money-bags.png";
+  moneyBagImage.addEventListener("load", (e) => {
+    ctx.drawImage(moneyBagImage, 0, 0, 512, 512, moneyBagInitialX, moneyBagY, 30, 30)
+  })
+
+  moneyBagY += 5
+  if (moneyBagY > canvas.height) {
+    moneyBagInitialX = Math.floor(Math.random() * (280 - 190) + 190);
+    moneyBagY = 0;
   }
 }
 
@@ -152,8 +167,6 @@ const drawHazard = () => {
     hazardY = -200;
   }
 }
-
-
 
 const drawCar = () => {
   const carImage = new Image();
@@ -200,7 +213,7 @@ function drawMoneyBag() {
 function draw() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   drawBackground();
-  drawPresent();
+  drawRewards();
   drawHazard();
   drawCar();
 
@@ -214,13 +227,20 @@ function draw() {
     hazardInitialX = -500;
     hazardY = -500;
     drawHealthBar(health);
-    health -= 5
+    health -= 10
   }
-  if (Math.abs(carX - presentInitialX) <= 30 && Math.abs(carY - presentY) <= 30 )  {
-    presentInitialX = -500;
-    presentY = -500;
+  if (Math.abs(carX - coinInitialX) <= 30 && Math.abs(carY - coinY) <= 30 )  {
+    coinInitialX = -500;
+    coinY = -500;
     score = score + 1;
   }
+
+  if (Math.abs(carX - moneyBagInitialX) <= 30 && Math.abs(carY - moneyBagY) <= 30 )  {
+    moneyBagInitialX = -500;
+    moneyBagY = -500;
+    score = score + 5;
+  }
+
   if (rightPressed) {
     carX += 5;
     if (carX + carWidth > 320) {
