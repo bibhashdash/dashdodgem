@@ -5,6 +5,10 @@ const carHeight = 50;
 let carSpeed = 5;
 let carX = (canvas.width / 2) - 25;
 let carY = canvas.height - 250;
+let interval = 0;
+let gameRunning = false;
+
+let roadMarkingsSpeed = 15;
 
 let rightPressed = false;
 let leftPressed = false;
@@ -50,9 +54,9 @@ const drawRoadMarkings = () => {
   ctx.fill();
   ctx.closePath();
 
-  roadMarkingsInitialYPosnOne += 10
+  roadMarkingsInitialYPosnOne += roadMarkingsSpeed
   if (roadMarkingsInitialYPosnOne > canvas.height) roadMarkingsInitialYPosnOne = -800;
-  roadMarkingsInitialYPosnOne += 10
+  roadMarkingsInitialYPosnOne += roadMarkingsSpeed
   if (roadMarkingsInitialYPosnTwo > canvas.height) roadMarkingsInitialYPosnTwo = -1800;
 }
 
@@ -62,7 +66,7 @@ let treeLeftInitialXThree = Math.floor(Math.random() * 100);
 let treeLeftInitialYOne = -(Math.floor(Math.random() * 200));
 let treeLeftInitialYTwo = -(Math.floor(Math.random() * 800));
 let treeLeftInitialYThree = -(Math.floor(Math.random() * 500));
-
+let treeSpeed = 10;
 const drawRandomTreesLeft = () => {
   const treeImage = new Image();
   treeImage.src = "tree.png";
@@ -71,9 +75,9 @@ const drawRandomTreesLeft = () => {
     ctx.drawImage(treeImage, 0, 0, 512, 512, treeLeftInitialXTwo, treeLeftInitialYTwo, 50, 50);
     ctx.drawImage(treeImage, 0, 0, 512, 512, treeLeftInitialXThree, treeLeftInitialYThree, 50, 50);
   })
-  treeLeftInitialYOne += 5;
-  treeLeftInitialYTwo += 5;
-  treeLeftInitialYThree += 5;
+  treeLeftInitialYOne += treeSpeed;
+  treeLeftInitialYTwo += treeSpeed;
+  treeLeftInitialYThree += treeSpeed;
   if (treeLeftInitialYOne > canvas.height) {
     treeLeftInitialXOne = Math.floor(Math.random() * 100);
     treeLeftInitialYOne = -(Math.floor(Math.random() * 200));
@@ -102,9 +106,9 @@ const drawRandomTreesRight = () => {
     ctx.drawImage(treeImage, 0, 0, 512, 512, treeRightInitialXTwo, treeRightInitialYTwo, 50, 50);
     ctx.drawImage(treeImage, 0, 0, 512, 512, treeRightInitialXThree, treeRightInitialYThree, 50, 50);
   })
-  treeRightInitialYOne += 5;
-  treeRightInitialYTwo += 5;
-  treeRightInitialYThree += 5;
+  treeRightInitialYOne += treeSpeed;
+  treeRightInitialYTwo += treeSpeed;
+  treeRightInitialYThree += treeSpeed;
   if (treeRightInitialYOne > canvas.height) {
     treeRightInitialXOne = Math.floor(Math.random() * (400 - 340) + 340);
     treeRightInitialYOne = -(Math.floor(Math.random() * 200));
@@ -124,6 +128,9 @@ let coinY = 0;
 
 let moneyBagInitialX = Math.floor(Math.random() * (280 - 190) + 190);
 let moneyBagY = 0;
+
+let coinSpeed = 10;
+let hazardSpeed = 10;
 const drawRewards = () => {
   const coinImage = new Image();
   coinImage.src = "coin.png";
@@ -131,7 +138,7 @@ const drawRewards = () => {
     ctx.drawImage(coinImage, 0, 0, 512, 512, coinInitialX, coinY, 30, 30)
   })
 
-  coinY += 5
+  coinY += coinSpeed;
   if (coinY > canvas.height) {
     coinInitialX = Math.floor(Math.random() * (280 - 190) + 190);
     coinY = 0;
@@ -143,7 +150,7 @@ const drawRewards = () => {
     ctx.drawImage(moneyBagImage, 0, 0, 512, 512, moneyBagInitialX, moneyBagY, 30, 30)
   })
 
-  moneyBagY += 5
+  moneyBagY += coinSpeed;
   if (moneyBagY > canvas.height) {
     moneyBagInitialX = Math.floor(Math.random() * (280 - 190) + 190);
     moneyBagY = 0;
@@ -161,7 +168,7 @@ const drawHazard = () => {
     ctx.drawImage(hazardImage, 0, 0, 512, 512, hazardInitialX, hazardY, 30, 30)
   })
 
-  hazardY += 5
+  hazardY += hazardSpeed
   if (hazardY > canvas.height) {
     hazardInitialX = Math.floor(Math.random() * (300 - 200) + 200);
     hazardY = -200;
@@ -193,15 +200,6 @@ const drawHealthBar = (width) => {
   ctx.closePath();
 }
 
-const drawHealthBarContainer = () => {
-  ctx.beginPath();
-  ctx.rect(8, 78, 100, 24);
-  ctx.strokeStyle = "white";
-  ctx.lineWidth = 2;
-  ctx.stroke();
-  ctx.closePath();
-}
-
 function drawMoneyBag() {
   const moneyBagImage = new Image();
   moneyBagImage.src = "money-bag.png";
@@ -228,6 +226,11 @@ function draw() {
     hazardY = -500;
     drawHealthBar(health);
     health -= 10
+    if (health === 0) {
+      alert("YOU LOSE!");
+      document.location.reload();
+      clearInterval(interval);
+    }
   }
   if (Math.abs(carX - coinInitialX) <= 30 && Math.abs(carY - coinY) <= 30 )  {
     coinInitialX = -500;
@@ -279,13 +282,19 @@ function keyUpHandler(e) {
 const drawBackground = () => {
   drawRoad();
   drawRoadMarkings();
-  // drawRoadMarkingsTwo();
   drawGrassLeft();
   drawGrassRight();
   drawRandomTreesLeft();
   drawRandomTreesRight();
-  // drawRandomAnimals();
-  // drawRandomPeople();
 }
 
-setInterval(draw, 10);
+// setInterval(draw, 10);
+function startGame() {
+  interval = setInterval(draw, 10);
+}
+
+const gameButton = document.querySelector("#start-game-button");
+gameButton.addEventListener("click", function () {
+  gameRunning = true;
+  startGame();
+});
