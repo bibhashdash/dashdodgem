@@ -2,13 +2,14 @@ const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 const carWidth = 50;
 const carHeight = 50;
-
+let carSpeed = 5;
 let carX = (canvas.width / 2) - 25;
 let carY = canvas.height - 250;
 
 let rightPressed = false;
 let leftPressed = false;
 let score = 0;
+let health = 140;
 const drawRoad = () => {
   ctx.beginPath();
   ctx.rect(160, 0, 160, canvas.height)
@@ -55,9 +56,9 @@ const drawRoadMarkings = () => {
   if (roadMarkingsInitialYPosnTwo > canvas.height) roadMarkingsInitialYPosnTwo = -1800;
 }
 
-let treeLeftInitialXOne = Math.floor(Math.random() * 130);
-let treeLeftInitialXTwo = Math.floor(Math.random() * 130);
-let treeLeftInitialXThree = Math.floor(Math.random() * 130);
+let treeLeftInitialXOne = Math.floor(Math.random() * 100);
+let treeLeftInitialXTwo = Math.floor(Math.random() * 100);
+let treeLeftInitialXThree = Math.floor(Math.random() * 100);
 let treeLeftInitialYOne = -(Math.floor(Math.random() * 200));
 let treeLeftInitialYTwo = -(Math.floor(Math.random() * 800));
 let treeLeftInitialYThree = -(Math.floor(Math.random() * 500));
@@ -74,15 +75,15 @@ const drawRandomTreesLeft = () => {
   treeLeftInitialYTwo += 5;
   treeLeftInitialYThree += 5;
   if (treeLeftInitialYOne > canvas.height) {
-    treeLeftInitialXOne = Math.floor(Math.random() * 130);
+    treeLeftInitialXOne = Math.floor(Math.random() * 100);
     treeLeftInitialYOne = -(Math.floor(Math.random() * 200));
   }
   if (treeLeftInitialYTwo > canvas.height) {
-    treeLeftInitialXTwo = Math.floor(Math.random() * 130);
+    treeLeftInitialXTwo = Math.floor(Math.random() * 100);
     treeLeftInitialYTwo = -(Math.floor(Math.random() * 800));
   }
   if (treeLeftInitialYThree > canvas.height) {
-    treeLeftInitialXThree = Math.floor(Math.random() * 130);
+    treeLeftInitialXThree = Math.floor(Math.random() * 100);
     treeLeftInitialYThree = -(Math.floor(Math.random() * 500));
   }
 };
@@ -118,18 +119,18 @@ const drawRandomTreesRight = () => {
   }
 };
 
-let presentInitialX = Math.floor(Math.random() * (320 - 160) + 160);
+let presentInitialX = Math.floor(Math.random() * (280 - 190) + 190);
 let presentY = 0;
 const drawPresent = () => {
   const presentImage = new Image();
-  presentImage.src = "gift.png";
+  presentImage.src = "coin.png";
   presentImage.addEventListener("load", (e) => {
     ctx.drawImage(presentImage, 0, 0, 512, 512, presentInitialX, presentY, 30, 30)
   })
 
   presentY += 5
   if (presentY > canvas.height) {
-    presentInitialX = Math.floor(Math.random() * (320 - 160) + 160);
+    presentInitialX = Math.floor(Math.random() * (280 - 190) + 190);
     presentY = 0;
   }
 }
@@ -165,7 +166,35 @@ const drawCar = () => {
 function drawScore() {
   ctx.font = "24px Arial";
   ctx.fillStyle = "#ffffff";
-  ctx.fillText("Score: "+score, 8, 20);
+  ctx.fillText(score, 60, 40);
+}
+
+const drawHealthBar = (width) => {
+  ctx.beginPath();
+  ctx.rect(5, 80, width, 10);
+  ctx.strokeStyle = "white";
+  ctx.lineWidth = 2;
+  ctx.fillStyle = "red";
+  ctx.fill();
+  ctx.stroke();
+  ctx.closePath();
+}
+
+const drawHealthBarContainer = () => {
+  ctx.beginPath();
+  ctx.rect(8, 78, 100, 24);
+  ctx.strokeStyle = "white";
+  ctx.lineWidth = 2;
+  ctx.stroke();
+  ctx.closePath();
+}
+
+function drawMoneyBag() {
+  const moneyBagImage = new Image();
+  moneyBagImage.src = "money-bag.png";
+  moneyBagImage.addEventListener("load", (e) => {
+    ctx.drawImage(moneyBagImage, 0, 0, 512, 512, 2, 5, 50, 50);
+  })
 }
 
 function draw() {
@@ -175,18 +204,23 @@ function draw() {
   drawHazard();
   drawCar();
 
-//   add collision detection for hazards and rewards here
+  drawMoneyBag();
   drawScore();
+  drawHealthBar(health);
 
 
 //   update score
-  if (Math.abs(carX - hazardInitialX) <= 50 && Math.abs(carY - hazardY) <= 50 )  {
-    score = score - 1;
+  if (Math.abs(carX - hazardInitialX) <= 30 && Math.abs(carY - hazardY) <= 30 )  {
+    hazardInitialX = -500;
+    hazardY = -500;
+    drawHealthBar(health);
+    health -= 5
   }
-  if (Math.abs(carX - presentInitialX) <= 50 && Math.abs(carY - presentY) <= 50 )  {
+  if (Math.abs(carX - presentInitialX) <= 30 && Math.abs(carY - presentY) <= 30 )  {
+    presentInitialX = -500;
+    presentY = -500;
     score = score + 1;
   }
-
   if (rightPressed) {
     carX += 5;
     if (carX + carWidth > 320) {
